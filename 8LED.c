@@ -31,15 +31,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define	DATA	12		// 
-#define	CLOCK	14
-#define	LOAD	10
+#define	DATA	12		// Pin Setup for Data
+#define	CLOCK	14		// Pin Setup for Clock
+#define	LOAD	10		// Pin Setup for Load
 
-#define	DECODE_MODE	0x09	//
-#define	INTENSITY	0x0a
-#define	SCAN_LIMIT	0x0b
-#define	SHUTDOWN	0x0c
-#define	DISPLAY_TEST	0x0f
+#define	DECODE_MODE	0x09	// Hex for Decode Mode
+#define	INTENSITY	0x0a	// Hex for Intensity
+#define	SCAN_LIMIT	0x0b	// Hex for Scan Limit
+#define	SHUTDOWN	0x0c	// Hex for Shutdown
+#define	DISPLAY_TEST	0x0f	// Hex for Display Test
 
 static void Send16bits (unsigned short output)
 {
@@ -47,86 +47,75 @@ static void Send16bits (unsigned short output)
 	
 	for (i=16; i>0; i--) 
 	{
-		unsigned short mask = 1 << (i - 1); // calculate bitmask
+		unsigned short mask = 1 << (i - 1);		// Calculate Bitmask
 		
-		digitalWrite(CLOCK, 0);  // set clock to 0
+		digitalWrite(CLOCK, 0);				// set Clock to 0
 		
-		// Send one bit on the data pin
+		if (output & mask) digitalWrite(DATA, 1);	// Send One Bit on the DATA Pin
+		else digitalWrite(DATA, 0);			// Send OFF
 		
-		if (output & mask) digitalWrite(DATA, 1);
-		else digitalWrite(DATA, 0);
-		
-		digitalWrite(CLOCK, 1);  // set clock to 1	 
+		digitalWrite(CLOCK, 1);				// set Clock to 1	 
 	}
 }
 
-
-// Take a reg numer and data and send to the max7219
-
 static void MAX7219Send (unsigned char reg_number, unsigned char dataout)
 {
-	digitalWrite(LOAD, 1);  // set LOAD 1 to start
-	Send16bits((reg_number << 8) + dataout);   // send 16 bits ( reg number + dataout )
-	digitalWrite(LOAD, 0);  // LOAD 0 to latch
-	digitalWrite(LOAD, 1);  // set LOAD 1 to finish
+	digitalWrite(LOAD, 1);				// Set LOAD 1 to Start
+	Send16bits((reg_number << 8) + dataout);	// Send 16 Bits ( Register # + Dataout )
+	digitalWrite(LOAD, 0);				// LOAD 0 to latch
+	digitalWrite(LOAD, 1);				// Set LOAD 1 to Finish
 }
 
 int main (void)
 {
-	int i;
-	int j;
-	int k;
+	int i, j;					// Define Integer(s)
 	
-	printf ("\n\nRaspberry Pi Max7219 Test using WiringPi\n\n");
+	printf ("MrRetupmoc's Raspberry Pi - Led Martix - Count to 256\n");
 	
-	if (wiringPiSetup () == -1) exit (1) ;
+	if (wiringPiSetup () == -1) exit (1);		// WiringPi Setup
 	
-	//We need 3 output pins to control the Max7219: Data, Clock and Load
-	
-	pinMode(DATA, OUTPUT);  
-	pinMode(CLOCK, OUTPUT);
-	pinMode(LOAD, OUTPUT);  
+	pinMode(DATA, OUTPUT);				// Setup Output Mode for Data
+	pinMode(CLOCK, OUTPUT);				// Setup Output Mode for Clock 
+	pinMode(LOAD, OUTPUT);				// Setup Output Mode for Load 
 		
-	MAX7219Send(SCAN_LIMIT, 16);
+	MAX7219Send(SCAN_LIMIT, 16);			// Scan Limit
 	
 	// BCD decode mode off : data bits correspond to the segments (A-G and DP) of the seven segment display.
 	// BCD mode on :  0 to 15 =  0 to 9, -, E, H, L, P, and ' '
 	
-	MAX7219Send(DECODE_MODE, 0);   // Set BCD decode mode on
-	MAX7219Send(DISPLAY_TEST, 0);  // Disable test mode
-	MAX7219Send(INTENSITY, 15);     // set brightness 0 to 15
-	MAX7219Send(SHUTDOWN, 1);      // come out of shutdown mode	/ turn on the digits
+	MAX7219Send(DECODE_MODE, 0);			// Set BCD decode mode on
+	MAX7219Send(DISPLAY_TEST, 0);			// Disable test mode
+	MAX7219Send(INTENSITY, 15);			// set brightness 0 to 15
+	MAX7219Send(SHUTDOWN, 1);			// come out of shutdown mode	/ turn on the digits
 	
-	for(i = 200; i > 0; i--)
+	for(i = 200; i > 0; i--)			// Loop for Slow and Fast Modes
 	{
-		for(j = 1; j < 255; j++)
+		for(j = 1; j < 255; j++)		// Loop for 256 Numbers
 		{
-			//for(k = 1; k < 2; k++)
-			//{
-				printf ("Sending %i \n", j);
-				MAX7219Send(1,j); 		 // displays the number 6 on digit 1
-				delay(i);
-			//}
+			printf ("Sending %i \n", j);	// Display on Console What is Being Sent
+			MAX7219Send(1,j);		// Displays the Binary Number on the Rows of Column 1
+			delay(i);			// Sleep
 		}
 		i = i - 149;
 	}
 
-	delay(500);
+	delay(500);					// Sleep
 
 	printf ("Printing FOIL \n");
-	MAX7219Send(1,5); 		 // displays the number 6 on digit 1
-	delay(400);
-	MAX7219Send(1,9); 		 // displays the number 6 on digit 1
-	delay(400);
-	MAX7219Send(1,6); 		 // displays the number 6 on digit 1
-	delay(400);
-	MAX7219Send(1,10); 		 // displays the number 6 on digit 1
-	delay(400);
 
-	delay(500);
+	MAX7219Send(1,5);				// Displays the First in FOIL
+	delay(400);					// Sleep
+	MAX7219Send(1,9);				// Displays the First in FOIL
+	delay(400);					// Sleep
+	MAX7219Send(1,6);				// Displays the First in FOIL
+	delay(400);					// Sleep
+	MAX7219Send(1,10);				// Displays the First in FOIL
+	delay(400);					// Sleep
+
+	delay(500);					// Sleep
 	
-	MAX7219Send(SHUTDOWN, 0);      // turn off the LED's
-	delay(200);
+	MAX7219Send(SHUTDOWN, 0);			// Turn OFF the LED's
+	delay(200);					// Sleep
 	
 	return 0;
 }

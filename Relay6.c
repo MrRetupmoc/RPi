@@ -40,7 +40,7 @@ int main (void)
 {
 	int speed = 1000;		// Sleep
 
-	wiringPiSetup ();		// WiringPi Setup
+	wiringPiSetup();		// WiringPi Setup
 
 	pinMode (relay0, OUTPUT);	// Setup Output Mode for Relay 1
 	pinMode (relay1, OUTPUT);	// Setup Output Mode for Relay 2
