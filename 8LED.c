@@ -1,26 +1,45 @@
 /*
-Raspberry Pi driving the Max7219 / AS1100
-to compile : make -lwiringPi -lwiringPiDev ./8LED
-*/
+	Filename : 8LED.c
+	
+	Description : Testing Output to a 8 by 8 Led Matrix Display using an [ AS1100 / MAX77219 ] via SPI 
+
+	Requirements : wiringPi
+	
+	Copyright (c) 2013 MrRetupmoc. <http://Retupmoc.ca>
+
+	*************************************************************************************************
+	*	This file is part of MrRetupmoc's RPi:							*
+	*												*
+	*	http;//www.Retupmoc.ca/?page_id=756							*
+	*	MrRetupmoc's RPi is free software: you can redistribute it and/or modify		*
+	*	it under the terms of the GNU Lesser General Public License as published by		*
+	*	the Free Software Foundation, either version 3 of the License, or			*
+	*	(at your option) any later version.							*
+	*												*
+	*	MrRetupmoc's RPi is distributed in the hope that it will be useful,			*
+	*	but WITHOUT ANY WARRANTY; without even the implied warranty of				*
+	*	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the				*
+	*	GNU Lesser General Public License for more details.					*
+	*												*
+	*	You should have received a copy of the GNU Lesser General Public License		*
+	*	along with MrRetupmoc's RPi.  If not, see <http://www.gnu.org/licenses/>.		*
+	*************************************************************************************************
+ */
  
 #include <wiringPi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 
-// define our pins :
+#define	DATA	12		// 
+#define	CLOCK	14
+#define	LOAD	10
 
-#define DATA        12 // GPIO 17 (WiringPi pin num 0)  header pin 11
-#define CLOCK       14 // GPIO 22 (WiringPi pin num 3)   header pin 15
-#define LOAD        10 // GPIO 23 (WiringPi pin num 4)   header pin 16
-
-// The Max7219 Registers :
-
-#define DECODE_MODE   0x09                       
-#define INTENSITY     0x0a                        
-#define SCAN_LIMIT    0x0b                        
-#define SHUTDOWN      0x0c                        
-#define DISPLAY_TEST  0x0f                         
+#define	DECODE_MODE	0x09	//
+#define	INTENSITY	0x0a
+#define	SCAN_LIMIT	0x0b
+#define	SHUTDOWN	0x0c
+#define	DISPLAY_TEST	0x0f
 
 static void Send16bits (unsigned short output)
 {
